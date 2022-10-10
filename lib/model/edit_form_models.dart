@@ -124,6 +124,120 @@ class FormTextInputViewType extends FormViewType {
   }
 }
 
+class FormRichTextInputViewType extends FormViewType {
+  final String key;
+  final Icon? icon;
+  final String label;
+  final String? defaultValue;
+  final String? Function(String?)? additionalValidator;
+
+  FormRichTextInputViewType({
+    required this.key,
+    this.icon,
+    required this.label,
+    this.defaultValue,
+    this.additionalValidator,
+  });
+
+  @override
+  FormViewModel getFormViewModel() {
+    return FormViewModel(
+        key: key,
+        type: FormViewModelType.RICH_TEXT,
+        keyboardType: TextInputType.text,
+        icon: icon,
+        label: label,
+        defaultValue: defaultValue ?? "",
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter a correct value';
+          }
+
+          if (additionalValidator != null) {
+            return additionalValidator!(value);
+          }
+
+          return null;
+        });
+  }
+}
+
+class FormListTextInputViewType extends FormViewType {
+  final String key;
+  final Icon? icon;
+  final String label;
+  final List<String> defaultValue;
+  final String? Function(String?)? additionalValidator;
+
+  FormListTextInputViewType({
+    required this.key,
+    this.icon,
+    required this.label,
+    this.defaultValue = const [],
+    this.additionalValidator,
+  });
+
+  @override
+  FormViewModel getFormViewModel() {
+    return FormViewModel(
+        key: key,
+        type: FormViewModelType.TEXT_LIST,
+        keyboardType: TextInputType.text,
+        icon: icon,
+        label: label,
+        defaultValue: defaultValue.toString(),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter a correct value';
+          }
+
+          if (additionalValidator != null) {
+            return additionalValidator!(value);
+          }
+
+          return null;
+        });
+  }
+}
+
+class FormBooleanInputViewType extends FormViewType {
+  final String key;
+  final Icon? icon;
+  final String label;
+  final bool defaultValue;
+  final String? Function(String?)? additionalValidator;
+
+  FormBooleanInputViewType({
+    required this.key,
+    this.icon,
+    required this.label,
+    this.defaultValue = false,
+    this.additionalValidator,
+  });
+
+  @override
+  FormViewModel getFormViewModel() {
+    return FormViewModel(
+        key: key,
+        type: FormViewModelType.BOOLEAN,
+        keyboardType: TextInputType.text,
+        icon: icon,
+        label: label,
+        defaultValue: defaultValue.toString(),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter a correct value';
+          }
+
+          if (additionalValidator != null) {
+            return additionalValidator!(value);
+          }
+
+          return null;
+        });
+  }
+}
+
 class FormEmailInputViewType extends FormViewType {
   final String key;
   final Icon? icon;
@@ -254,6 +368,9 @@ class FormViewModel {
 
 enum FormViewModelType {
   TEXT,
+  RICH_TEXT,
+  TEXT_LIST,
+  BOOLEAN,
   SELECTOR,
   YEAR_PICKER,
 }

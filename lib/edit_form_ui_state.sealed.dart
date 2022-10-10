@@ -10,7 +10,7 @@ part of 'edit_form_ui_state.dart';
 ///
 /// ([EditFormUIStateShowLoading] showLoading){} with data equality
 ///
-/// ([EditFormUIStateShowContent] showContent){[List<FormViewModel>] viewModels} with data equality
+/// ([EditFormUIStateShowContent] showContent){[List<FormViewModel>] viewModels, [bool] showNonEditableFields} with data equality
 ///
 /// }
 @SealedManifest(_EditFormUIState)
@@ -21,6 +21,7 @@ abstract class EditFormUIState {
 
   const factory EditFormUIState.showContent({
     required List<FormViewModel> viewModels,
+    required bool showNonEditableFields,
   }) = EditFormUIStateShowContent;
 
   bool get isShowLoading => this is EditFormUIStateShowLoading;
@@ -49,13 +50,16 @@ abstract class EditFormUIState {
 
   R when<R extends Object?>({
     required R Function() showLoading,
-    required R Function(List<FormViewModel> viewModels) showContent,
+    required R Function(
+            List<FormViewModel> viewModels, bool showNonEditableFields)
+        showContent,
   }) {
     final editFormUIState = this;
     if (editFormUIState is EditFormUIStateShowLoading) {
       return showLoading();
     } else if (editFormUIState is EditFormUIStateShowContent) {
-      return showContent(editFormUIState.viewModels);
+      return showContent(
+          editFormUIState.viewModels, editFormUIState.showNonEditableFields);
     } else {
       throw AssertionError();
     }
@@ -63,7 +67,8 @@ abstract class EditFormUIState {
 
   R maybeWhen<R extends Object?>({
     R Function()? showLoading,
-    R Function(List<FormViewModel> viewModels)? showContent,
+    R Function(List<FormViewModel> viewModels, bool showNonEditableFields)?
+        showContent,
     required R Function(EditFormUIState editFormUIState) orElse,
   }) {
     final editFormUIState = this;
@@ -71,7 +76,8 @@ abstract class EditFormUIState {
       return showLoading != null ? showLoading() : orElse(editFormUIState);
     } else if (editFormUIState is EditFormUIStateShowContent) {
       return showContent != null
-          ? showContent(editFormUIState.viewModels)
+          ? showContent(
+              editFormUIState.viewModels, editFormUIState.showNonEditableFields)
           : orElse(editFormUIState);
     } else {
       throw AssertionError();
@@ -81,7 +87,8 @@ abstract class EditFormUIState {
   @Deprecated('Use `whenOrNull` instead. Will be removed by next release.')
   void partialWhen({
     void Function()? showLoading,
-    void Function(List<FormViewModel> viewModels)? showContent,
+    void Function(List<FormViewModel> viewModels, bool showNonEditableFields)?
+        showContent,
     void Function(EditFormUIState editFormUIState)? orElse,
   }) {
     final editFormUIState = this;
@@ -93,7 +100,8 @@ abstract class EditFormUIState {
       }
     } else if (editFormUIState is EditFormUIStateShowContent) {
       if (showContent != null) {
-        showContent(editFormUIState.viewModels);
+        showContent(
+            editFormUIState.viewModels, editFormUIState.showNonEditableFields);
       } else if (orElse != null) {
         orElse(editFormUIState);
       }
@@ -104,7 +112,8 @@ abstract class EditFormUIState {
 
   R? whenOrNull<R extends Object?>({
     R Function()? showLoading,
-    R Function(List<FormViewModel> viewModels)? showContent,
+    R Function(List<FormViewModel> viewModels, bool showNonEditableFields)?
+        showContent,
     R Function(EditFormUIState editFormUIState)? orElse,
   }) {
     final editFormUIState = this;
@@ -114,7 +123,8 @@ abstract class EditFormUIState {
           : orElse?.call(editFormUIState);
     } else if (editFormUIState is EditFormUIStateShowContent) {
       return showContent != null
-          ? showContent(editFormUIState.viewModels)
+          ? showContent(
+              editFormUIState.viewModels, editFormUIState.showNonEditableFields)
           : orElse?.call(editFormUIState);
     } else {
       throw AssertionError();
@@ -211,22 +221,26 @@ class EditFormUIStateShowLoading extends EditFormUIState with EquatableMixin {
   List<Object?> get props => [];
 }
 
-/// (([EditFormUIStateShowContent] : [EditFormUIState]) showContent){[List<FormViewModel>] viewModels}
+/// (([EditFormUIStateShowContent] : [EditFormUIState]) showContent){[List<FormViewModel>] viewModels, [bool] showNonEditableFields}
 ///
 /// with data equality
 class EditFormUIStateShowContent extends EditFormUIState with EquatableMixin {
   const EditFormUIStateShowContent({
     required this.viewModels,
+    required this.showNonEditableFields,
   }) : super._internal();
 
   final List<FormViewModel> viewModels;
+  final bool showNonEditableFields;
 
   @override
-  String toString() => 'EditFormUIState.showContent(viewModels: $viewModels)';
+  String toString() =>
+      'EditFormUIState.showContent(viewModels: $viewModels, showNonEditableFields: $showNonEditableFields)';
 
   @override
   List<Object?> get props => [
         viewModels,
+        showNonEditableFields,
       ];
 }
 

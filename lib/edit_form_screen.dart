@@ -10,6 +10,7 @@ import 'model/editable_model.dart';
 class EditFormScreen<T> extends StatelessWidget {
   final String title;
   final EditableModel<T> editableModel;
+  final bool showPreview;
   final Function(T) onSubmit;
   late final EditFormUiDelegate<T> _delegate;
 
@@ -17,11 +18,13 @@ class EditFormScreen<T> extends StatelessWidget {
     super.key,
     required this.title,
     required this.editableModel,
+    this.showPreview = false,
     required this.onSubmit,
   }) {
     _delegate = EditFormUiDelegate<T>(
       editableModel: editableModel,
       onSubmit: onSubmit,
+      showNonEditableFields: showPreview,
     );
     _delegate.init();
   }
@@ -35,7 +38,7 @@ class EditFormScreen<T> extends StatelessWidget {
       builder: (uiState) => uiState
           .when(
             showLoading: () => UIUtils.getLoadingWidget(),
-            showContent: (viewModels) => Form(
+            showContent: (viewModels, showNonEditableFields) => Form(
               key: _formKey,
               child: SingleChildScrollView(
                 child: Column(
@@ -47,9 +50,18 @@ class EditFormScreen<T> extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ).padding(vertical: 16, horizontal: 16),
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () {
+                        _delegate.toggleShowNonEditableFields();
+                      },
+                    ).changeVisibility(isVisible: showNonEditableFields),
                     ...viewModels.map<Widget>(
-                      (formViewmodel) =>
-                          _convertViewModelToFormField(context, formViewmodel),
+                      (formViewmodel) => _convertViewModelToFormField(
+                        context,
+                        formViewmodel,
+                        showNonEditableFields,
+                      ),
                     ),
                     ElevatedButton(
                       onPressed: (() {
@@ -73,14 +85,21 @@ class EditFormScreen<T> extends StatelessWidget {
     );
   }
 
-  FormField _convertViewModelToFormField(
+  Widget _convertViewModelToFormField(
     BuildContext context,
     FormViewModel formViewModel,
+    bool showNonEditableFields,
   ) {
     _makeControllerForIndexIfPossible(
       formViewModel.key,
       formViewModel.defaultValue,
     );
+
+    if (showNonEditableFields) {
+      return Text(
+        "${formViewModel.label}: ${formViewModel.defaultValue}",
+      );
+    }
 
     switch (formViewModel.type) {
       case FormViewModelType.TEXT:
@@ -92,6 +111,35 @@ class EditFormScreen<T> extends StatelessWidget {
             icon: formViewModel.icon,
             labelText: formViewModel.label,
           ),
+        );
+      case FormViewModelType.RICH_TEXT:
+        return TextFormField(
+          controller: _textControllers[formViewModel.key],
+          validator: formViewModel.validator,
+          keyboardType: formViewModel.keyboardType,
+          decoration: InputDecoration(
+            icon: formViewModel.icon,
+            labelText: formViewModel.label,
+          ),
+          maxLines: 10,
+        );
+      case FormViewModelType.TEXT_LIST:
+        return TextFormField(
+          controller: _textControllers[formViewModel.key],
+          validator: formViewModel.validator,
+          keyboardType: formViewModel.keyboardType,
+          decoration: InputDecoration(
+            icon: formViewModel.icon,
+            labelText: formViewModel.label,
+          ),
+        );
+      case FormViewModelType.BOOLEAN:
+        return CheckboxListTile(
+          value: _textControllers[formViewModel.key]?.text == "true",
+          onChanged: (value) {
+            _textControllers[formViewModel.key]?.text = value.toString();
+          },
+          title: Text(formViewModel.label),
         );
       case FormViewModelType.SELECTOR:
         return DropdownButtonFormField(
@@ -107,7 +155,7 @@ class EditFormScreen<T> extends StatelessWidget {
                   ))
               .toList(),
           onChanged: (value) {
-            _textControllers[formViewModel.key]!.text = value;
+            _textControllers[formViewModel.key]!.text = value ?? "";
           },
           validator: (value) {
             if (formViewModel.validator != null && value is String) {
@@ -144,7 +192,8 @@ class EditFormScreen<T> extends StatelessWidget {
           },
         );
       default:
-        throw Exception("not a valid type: ${formViewModel.runtimeType}");
+        throw Exception(
+            "not a valid type: ${formViewModel.type} - ${formViewModel.runtimeType}");
     }
   }
 

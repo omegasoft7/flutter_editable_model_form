@@ -7,7 +7,10 @@ part 'edit_form_ui_state.sealed.dart';
 @Sealed()
 abstract class _EditFormUIState {
   void showLoading();
-  void showContent(List<FormViewModel> viewModels);
+  void showContent(
+    List<FormViewModel> viewModels,
+    bool showNonEditableFields,
+  );
 }
 
 @Sealed()
