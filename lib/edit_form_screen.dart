@@ -2,6 +2,7 @@ import 'package:architecture/extension/widget_extensions.dart';
 import 'package:architecture/ui_extensions.dart';
 import 'package:architecture/utils/ui_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'model/edit_form_models.dart';
 import 'edit_form_ui_delegate.dart';
@@ -103,13 +104,48 @@ class EditFormScreen<T> extends StatelessWidget {
     );
 
     if (showNonEditableFields) {
-      return Text(
-        "${formViewModel.label}: ${formViewModel.defaultValue}",
-      );
+      switch (formViewModel.type) {
+        case FormViewModelType.YEAR_PICKER:
+        case FormViewModelType.SELECTOR:
+        case FormViewModelType.BOOLEAN:
+        case FormViewModelType.TEXT_LIST:
+        case FormViewModelType.RICH_TEXT:
+        case FormViewModelType.TEXT:
+          return Text(
+            "${formViewModel.label}: ${formViewModel.defaultValue}",
+          );
+        case FormViewModelType.LINK:
+          return TextButton(
+            onPressed: () {
+              if (formViewModel.previewPrefix != null) {
+                launchUrl(Uri.parse(
+                    "${formViewModel.previewPrefix}${formViewModel.defaultValue}"));
+              } else {
+                final urlWithHttps = makeSureThatUrlHasHttps(
+                  formViewModel.defaultValue ?? "",
+                );
+                launchUrl(urlWithHttps);
+              }
+            },
+            child: Text(
+              "${formViewModel.label}: ${formViewModel.defaultValue}",
+            ),
+          );
+      }
     }
 
     switch (formViewModel.type) {
       case FormViewModelType.TEXT:
+        return TextFormField(
+          controller: _textControllers[formViewModel.key],
+          validator: formViewModel.validator,
+          keyboardType: formViewModel.keyboardType,
+          decoration: InputDecoration(
+            icon: formViewModel.icon,
+            labelText: formViewModel.label,
+          ),
+        );
+      case FormViewModelType.LINK:
         return TextFormField(
           controller: _textControllers[formViewModel.key],
           validator: formViewModel.validator,
@@ -201,6 +237,16 @@ class EditFormScreen<T> extends StatelessWidget {
       default:
         throw Exception(
             "not a valid type: ${formViewModel.type} - ${formViewModel.runtimeType}");
+    }
+  }
+
+  Uri makeSureThatUrlHasHttps(String url) {
+    if (url.startsWith("http://")) {
+      return Uri.parse(url.replaceFirst("http://", "https://"));
+    } else if (url.startsWith("https://")) {
+      return Uri.parse(url);
+    } else {
+      return Uri.parse("https://$url");
     }
   }
 

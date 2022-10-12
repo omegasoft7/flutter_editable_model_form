@@ -3,7 +3,7 @@ description: Make your model editable with ease
 repository: https://github.com/omegasoft7/flutter_editable_model_form
 homepage: https://github.com/omegasoft7/flutter_editable_model_form
 
-version: 0.0.2
+version: 0.0.3
 
 environment:
   sdk: '>=2.18.2 <3.0.0'
@@ -16,6 +16,7 @@ dependencies:
   sealed_class_annotations: ^1.13.2
   disposebag: ^1.5.1
   architecture: ^0.0.5
+  url_launcher: ^6.1.6
 
 dev_dependencies:
   flutter_test:

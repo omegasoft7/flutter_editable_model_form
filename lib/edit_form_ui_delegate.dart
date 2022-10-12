@@ -52,6 +52,8 @@ class EditFormUiDelegate<T>
           return MapEntry(key.getFormViewModel().key, int.parse(value));
         case FormTextInputViewType:
           return MapEntry(key.getFormViewModel().key, value);
+        case FormLinkInputViewType:
+          return MapEntry(key.getFormViewModel().key, value);
         case FormRichTextInputViewType:
           return MapEntry(key.getFormViewModel().key, value);
         case FormListTextInputViewType:

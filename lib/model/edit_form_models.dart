@@ -132,6 +132,49 @@ class FormTextInputViewType extends FormViewType {
   }
 }
 
+class FormLinkInputViewType extends FormViewType {
+  final String key;
+  final Icon? icon;
+  final String label;
+  final String? defaultValue;
+  final bool isRequired;
+  final String? previewPrefix;
+  final String? Function(String?)? additionalValidator;
+
+  FormLinkInputViewType({
+    required this.key,
+    this.icon,
+    required this.label,
+    this.defaultValue,
+    this.isRequired = true,
+    this.previewPrefix,
+    this.additionalValidator,
+  });
+
+  @override
+  FormViewModel getFormViewModel() {
+    return FormViewModel(
+        key: key,
+        type: FormViewModelType.LINK,
+        keyboardType: TextInputType.text,
+        icon: icon,
+        label: label,
+        defaultValue: defaultValue ?? "",
+        previewPrefix: previewPrefix,
+        validator: (value) {
+          if (isRequired && (value == null || value.isEmpty)) {
+            return 'Please enter a correct value';
+          }
+
+          if (additionalValidator != null) {
+            return additionalValidator!(value);
+          }
+
+          return null;
+        });
+  }
+}
+
 class FormRichTextInputViewType extends FormViewType {
   final String key;
   final Icon? icon;
@@ -380,6 +423,7 @@ class FormViewModel {
   final Icon? icon;
   final String label;
   final String? defaultValue;
+  final String? previewPrefix;
   final List<String> selectorItems;
   final String? Function(String?)? validator;
 
@@ -390,6 +434,7 @@ class FormViewModel {
     this.icon,
     required this.label,
     this.defaultValue,
+    this.previewPrefix,
     this.selectorItems = const [],
     this.validator,
   });
@@ -397,6 +442,7 @@ class FormViewModel {
 
 enum FormViewModelType {
   TEXT,
+  LINK,
   RICH_TEXT,
   TEXT_LIST,
   BOOLEAN,
