@@ -56,12 +56,17 @@ class EditFormScreen<T> extends StatelessWidget {
                         _delegate.toggleShowNonEditableFields();
                       },
                     ).changeVisibility(isVisible: showNonEditableFields),
-                    ...viewModels.map<Widget>(
-                      (formViewmodel) => _convertViewModelToFormField(
-                        context,
-                        formViewmodel,
-                        showNonEditableFields,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: viewModels
+                          .map<Widget>(
+                            (formViewmodel) => _convertViewModelToFormField(
+                              context,
+                              formViewmodel,
+                              showNonEditableFields,
+                            ),
+                          )
+                          .toList(),
                     ),
                     ElevatedButton(
                       onPressed: (() {
