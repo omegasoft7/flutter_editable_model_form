@@ -75,7 +75,9 @@ class EditFormScreen<T> extends StatelessWidget {
                         }
                       }),
                       child: const Text("Submit"),
-                    ).padding(top: 16, horizontal: 8)
+                    )
+                        .padding(top: 16, horizontal: 8)
+                        .changeVisibility(isVisible: !showNonEditableFields)
                   ],
                 ),
               ),

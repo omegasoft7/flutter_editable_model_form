@@ -9,6 +9,7 @@ class FormCurrencyInputViewType extends FormViewType {
   final Icon? icon;
   final String label;
   final double? defaultValue;
+  final bool isRequired;
   final String? Function(String?)? additionalValidator;
 
   FormCurrencyInputViewType({
@@ -16,6 +17,7 @@ class FormCurrencyInputViewType extends FormViewType {
     this.icon,
     required this.label,
     this.defaultValue,
+    this.isRequired = true,
     this.additionalValidator,
   });
 
@@ -30,9 +32,10 @@ class FormCurrencyInputViewType extends FormViewType {
         label: label,
         defaultValue: defaultValue?.toString() ?? "0.00",
         validator: (value) {
-          if (value == null ||
-              value.isEmpty ||
-              double.tryParse(value) == null) {
+          if (isRequired &&
+              (value == null ||
+                  value.isEmpty ||
+                  double.tryParse(value) == null)) {
             return 'Please enter a correct price';
           }
 
@@ -50,6 +53,7 @@ class FormNumberInputViewType extends FormViewType {
   final Icon? icon;
   final String label;
   final int? defaultValue;
+  final bool isRequired;
   final String? Function(String?)? additionalValidator;
 
   FormNumberInputViewType({
@@ -57,6 +61,7 @@ class FormNumberInputViewType extends FormViewType {
     this.icon,
     required this.label,
     this.defaultValue,
+    this.isRequired = true,
     this.additionalValidator,
   });
 
@@ -71,9 +76,10 @@ class FormNumberInputViewType extends FormViewType {
         label: label,
         defaultValue: defaultValue?.toString() ?? "0",
         validator: (value) {
-          if (value == null ||
-              value.isEmpty ||
-              double.tryParse(value) == null) {
+          if (isRequired &&
+              (value == null ||
+                  value.isEmpty ||
+                  double.tryParse(value) == null)) {
             return 'Please enter a correct number';
           }
 
@@ -91,6 +97,7 @@ class FormTextInputViewType extends FormViewType {
   final Icon? icon;
   final String label;
   final String? defaultValue;
+  final bool isRequired;
   final String? Function(String?)? additionalValidator;
 
   FormTextInputViewType({
@@ -98,6 +105,7 @@ class FormTextInputViewType extends FormViewType {
     this.icon,
     required this.label,
     this.defaultValue,
+    this.isRequired = true,
     this.additionalValidator,
   });
 
@@ -111,7 +119,7 @@ class FormTextInputViewType extends FormViewType {
         label: label,
         defaultValue: defaultValue ?? "",
         validator: (value) {
-          if (value == null || value.isEmpty) {
+          if (isRequired && (value == null || value.isEmpty)) {
             return 'Please enter a correct value';
           }
 
@@ -129,6 +137,7 @@ class FormRichTextInputViewType extends FormViewType {
   final Icon? icon;
   final String label;
   final String? defaultValue;
+  final bool isRequired;
   final String? Function(String?)? additionalValidator;
 
   FormRichTextInputViewType({
@@ -136,6 +145,7 @@ class FormRichTextInputViewType extends FormViewType {
     this.icon,
     required this.label,
     this.defaultValue,
+    this.isRequired = true,
     this.additionalValidator,
   });
 
@@ -149,7 +159,7 @@ class FormRichTextInputViewType extends FormViewType {
         label: label,
         defaultValue: defaultValue ?? "",
         validator: (value) {
-          if (value == null || value.isEmpty) {
+          if (isRequired && (value == null || value.isEmpty)) {
             return 'Please enter a correct value';
           }
 
@@ -167,6 +177,7 @@ class FormListTextInputViewType extends FormViewType {
   final Icon? icon;
   final String label;
   final List<String> defaultValue;
+  final bool isRequired;
   final String? Function(String?)? additionalValidator;
 
   FormListTextInputViewType({
@@ -174,6 +185,7 @@ class FormListTextInputViewType extends FormViewType {
     this.icon,
     required this.label,
     this.defaultValue = const [],
+    this.isRequired = true,
     this.additionalValidator,
   });
 
@@ -185,9 +197,10 @@ class FormListTextInputViewType extends FormViewType {
         keyboardType: TextInputType.text,
         icon: icon,
         label: label,
-        defaultValue: defaultValue.toString(),
+        defaultValue:
+            defaultValue.toString().replaceAll('[', '').replaceAll(']', ''),
         validator: (value) {
-          if (value == null || value.isEmpty) {
+          if (isRequired && (value == null || value.isEmpty)) {
             return 'Please enter a correct value';
           }
 
@@ -205,6 +218,7 @@ class FormBooleanInputViewType extends FormViewType {
   final Icon? icon;
   final String label;
   final bool defaultValue;
+  final bool isRequired;
   final String? Function(String?)? additionalValidator;
 
   FormBooleanInputViewType({
@@ -212,6 +226,7 @@ class FormBooleanInputViewType extends FormViewType {
     this.icon,
     required this.label,
     this.defaultValue = false,
+    this.isRequired = true,
     this.additionalValidator,
   });
 
@@ -225,7 +240,7 @@ class FormBooleanInputViewType extends FormViewType {
         label: label,
         defaultValue: defaultValue.toString(),
         validator: (value) {
-          if (value == null || value.isEmpty) {
+          if (isRequired && (value == null || value.isEmpty)) {
             return 'Please enter a correct value';
           }
 
@@ -243,12 +258,16 @@ class FormEmailInputViewType extends FormViewType {
   final Icon? icon;
   final String label;
   final String? defaultValue;
+  final bool isRequired;
+  final String? Function(String?)? additionalValidator;
 
   FormEmailInputViewType({
     required this.key,
     this.icon,
     required this.label,
     this.defaultValue,
+    this.isRequired = true,
+    this.additionalValidator,
   });
 
   @override
@@ -261,14 +280,19 @@ class FormEmailInputViewType extends FormViewType {
         label: label,
         defaultValue: defaultValue ?? "",
         validator: (value) {
-          if (value == null || value.isEmpty) {
+          if (isRequired && (value == null || value.isEmpty)) {
             return 'Please enter an email address';
           }
 
-          if (!RegExp(
-                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-              .hasMatch(value)) {
+          if (isRequired &&
+              (value == null ||
+                  !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                      .hasMatch(value))) {
             return 'Please enter a valid email address';
+          }
+
+          if (additionalValidator != null) {
+            return additionalValidator!(value);
           }
 
           return null;
@@ -282,6 +306,7 @@ class FormSelectorInputViewType extends FormViewType {
   final Icon? icon;
   final String label;
   final String? defaultValue;
+  final bool isRequired;
 
   FormSelectorInputViewType({
     required this.key,
@@ -289,6 +314,7 @@ class FormSelectorInputViewType extends FormViewType {
     this.icon,
     required this.label,
     this.defaultValue,
+    this.isRequired = true,
   });
 
   @override
@@ -302,7 +328,7 @@ class FormSelectorInputViewType extends FormViewType {
         defaultValue: items.contains(defaultValue) ? defaultValue : null,
         selectorItems: items,
         validator: (value) {
-          if (value == null || value.isEmpty) {
+          if (isRequired && (value == null || value.isEmpty)) {
             return 'Please select an item from the list';
           }
 
@@ -316,12 +342,14 @@ class FormYearPickerViewType extends FormViewType {
   final Icon? icon;
   final String label;
   final int? defaultValue;
+  final bool isRequired;
 
   FormYearPickerViewType({
     required this.key,
     this.icon,
     required this.label,
     this.defaultValue,
+    this.isRequired = true,
   });
 
   @override
@@ -334,7 +362,8 @@ class FormYearPickerViewType extends FormViewType {
       label: label,
       defaultValue: defaultValue?.toString() ?? "0",
       validator: (value) {
-        if (value == null || value.isEmpty || int.tryParse(value) == null) {
+        if (isRequired &&
+            (value == null || value.isEmpty || int.tryParse(value) == null)) {
           return 'Please select a year';
         }
 
